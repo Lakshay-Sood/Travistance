@@ -13,10 +13,17 @@ exports.getOverview = catchAsync(async (req, res) => {
 });
 
 exports.getUserBookings = catchAsync(async (req, res) => {
-  const bookings = await Booking.find({ user: req.user.id });
+  const bookings = await Booking.find({ user: req.user.id }).sort('-createdAt');
   const tourIDs = bookings.map(el => el.tour);
-
   const tours = await Tour.find({ _id: { $in: tourIDs } });
+
+  // ** tried to show booked tours sorted by booked date
+  // const tours = [];
+  // await Promise.all(
+  //   tourIDs.map(async tourID => {
+  //     tours.push(await Tour.findById(tourID));
+  //   })
+  // );
 
   res.status(200).render('overview', {
     title: 'My Bookings',
@@ -58,7 +65,7 @@ exports.getUser = (req, res, next) => {
 exports.alerts = (req, res, next) => {
   const { alert } = req.query;
   if (alert === 'booking') {
-    res.locals.alert = `Your booking was successful. Please check your email. \nIf the booking doesn't show up here, check again later.`;
+    res.locals.alert = `Your booking was successful. Please check your email. <br>If the booking doesn't show up here, check again later.`;
   }
 
   next();

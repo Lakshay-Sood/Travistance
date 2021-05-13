@@ -84,5 +84,5 @@ if (bookTourButton) {
 }
 
 // ## alerts (booking alert)
-const alert = document.getElementsByTagName('body').dataset.alert;
-if (alert) showAlert('success', alert, 20);
+const alertMessage = document.querySelector('body').dataset?.alert;
+if (alertMessage) showAlert('success', alertMessage, 20);
