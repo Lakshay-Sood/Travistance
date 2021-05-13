@@ -34,8 +34,12 @@ app.set('views', path.join(__dirname, 'views'));
 // not in the course (put from stackoverflow to test problem: cookie not being stored in browser)
 // <solved>: Issue was => server was running on 127.0.0.1:8050 but in browser i had opened localhost:8050
 //                        and localhost could be (and was being) mapped to another ip too, hence cors problem occured
-// app.use(cors());
-// app.use(cors({ origin: true, credentials: true }));
+// ** this will only allow 'simple requests' (GET, POST)
+app.use(cors());
+
+// ** this is required to allow 'non-simple requests' (PUT, PATCH, DELETE or req with cookies or non standard headers)
+// ** cuz browser first sends an 'options' request (before the origin req to check if its safe to perform) and so we have to respond to it
+app.options('*', cors());
 
 //Set security http headers
 app.use(helmet());
