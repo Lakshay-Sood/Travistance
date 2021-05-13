@@ -16,6 +16,7 @@ module.exports = class Email {
       return 1;
     }
 
+    // * using mailtrap.io for development
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
