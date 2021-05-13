@@ -53,7 +53,7 @@ exports.createCheckoutSession = catchAsync(async (req, res, next) => {
 //   res.redirect(req.originalUrl.split('?')[0]);
 // };
 
-exports.createBookingCheckout = async session => {
+const createBookingCheckout = async session => {
   // these attributes of session were checked from webhooks req sent
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
