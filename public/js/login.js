@@ -7,8 +7,8 @@ export const login = async (email, password) => {
   try {
     const res = await axios({
       method: 'post',
-      url: '/api/v1/users/login',
-      baseURL: 'http://127.0.0.1:8050',
+      url: '/api/v1/users/login', //relative url
+      // baseURL: 'http://127.0.0.1:8050',    //not required as our API and website are hosted on the same server
       data: {
         email,
         password
@@ -29,7 +29,7 @@ export const login = async (email, password) => {
 
 export const logout = async () => {
   try {
-    const res = await axios.get('http://127.0.0.1:8050/api/v1/users/logout');
+    const res = await axios.get('/api/v1/users/logout');
 
     if (res.data.status === 'success') {
       showAlert('success', 'Logged out successfully!');

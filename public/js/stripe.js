@@ -8,7 +8,7 @@ export const stripeSession = async tourId => {
     );
 
     const sessionRes = await axios.get(
-      `http://127.0.0.1:8050/api/v1/bookings/create-session/${tourId}`
+      `/api/v1/bookings/create-session/${tourId}`
     );
 
     stripe.redirectToCheckout({ sessionId: sessionRes.data.session.id });

@@ -18,7 +18,7 @@ const handleValidatorErrorDB = err => {
     .map(el => el.message)
     .join('. ');
   const message = `Invalid input data. ${errors}`;
-  console.log(message);
+  // console.log(message);
   return new AppError(400, message);
 };
 

@@ -5,7 +5,7 @@ import { displayMap } from './mapbox';
 import { updateSettings } from './updateSettings';
 import { stripeSession } from './stripe';
 
-console.log('hello from index');
+// console.log('hello from index');
 
 // # DOM ELEMENTS
 const mapBox = document.getElementById('map');
