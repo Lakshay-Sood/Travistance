@@ -5,16 +5,20 @@ const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel');
+const User = require('../models/userModel');
 
 exports.createCheckoutSession = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.tourId);
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    // ** sendind to a temp url so as to add this booking in the database upon successful payment
-    success_url: `${req.protocol}://${req.get('host')}/?tourId=${
-      req.params.tourId
-    }&userId=${req.user.id}&price=${tour.price}`,
+    // this (commented out) is am insecure route  (cuz anyone who know the url pattern can create a fake booking)
+    // wont have this problem if we use stripe webhooks (which we do now)
+    // ** used to send to a temp url so as to add this booking in the database upon successful payment
+    // success_url: `${req.protocol}://${req.get('host')}/?tourId=${
+    //   req.params.tourId
+    // }&userId=${req.user.id}&price=${tour.price}`,
+    success_url: `${req.protocol}://${req.get('host')}/my-bookings`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
@@ -24,7 +28,9 @@ exports.createCheckoutSession = catchAsync(async (req, res, next) => {
         name: tour.name,
         description: tour.summary,
         images: [
-          'https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fclipart-library.com%2Fimg%2F2047024.png&f=1&nofb=1'
+          `${req.protocol}://${req.get('host')}/public/img/tours/${
+            tour.imageCover
+          }`
         ],
         amount: tour.price * 100,
         currency: 'usd',
@@ -39,17 +45,40 @@ exports.createCheckoutSession = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createBookingCheckout = async (req, res, next) => {
-  // ! this is am insecure route  (cuz anyone who know the url pattern can create a fake booking)
-  // wont have this problem if we used stripe paid version, cuz it gives us access to its webhooks
+// exports.createBookingCheckout = async (req, res, next) => {
+//   const { tourId, userId, price } = req.query;
+//   if (!tourId || !userId || !price) return next();
 
-  const { tourId, userId, price } = req.query;
-  if (!tourId || !userId || !price) return next();
+//   await Booking.create({ tour: tourId, user: userId, price });
 
-  await Booking.create({ tour: tourId, user: userId, price });
+//   // to provide a bit security cuz user wont be able to see the unsafe url
+//   res.redirect(req.originalUrl.split('?')[0]);
+// };
 
-  // to provide a bit security cuz user wont be able to see the unsafe url
-  res.redirect(req.originalUrl.split('?')[0]);
+exports.createBookingCheckout = async session => {
+  const tour = session.client_reference_id;
+  const user = (await User.findOne({ email: session.customer_email })).id;
+  const price = session.display_items[0].amount / 100;
+};
+
+exports.webhookCheckout = (req, res, next) => {
+  const signature = req.headers['stripe-signature'];
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    res.status(400).send(`Webhook error: ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed')
+    createBookingCheckout(event.data.object);
+
+  res.status(200).json({ received: true });
 };
 
 exports.getAllBookings = factory.getAll(Booking);

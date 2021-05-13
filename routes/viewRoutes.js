@@ -9,7 +9,7 @@ router.use(authController.isLoggedIn);
 
 router.get(
   '/',
-  bookingController.createBookingCheckout, //cuz stripe redirects to home page upon successful payment
+  // bookingController.createBookingCheckout, //cuz stripe redirects to home page upon successful payment BUT now we use stripe webhooks
   viewController.getOverview
 );
 router.get('/tour/:slug', viewController.getTour);
