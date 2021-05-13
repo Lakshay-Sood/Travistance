@@ -20,6 +20,8 @@ const bookingRouter = require('./routes/bookingRoutes');
 
 const app = express();
 
+app.enable('trust proxy');
+
 // # 0) Setting Template engine
 //sets pug as the view engine
 app.set('view engine', 'pug');

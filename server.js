@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 //example of such error is console.log(abc). and it logs 'ReferenceError abc is not defined'.
 process.on('uncaughtException', err => {
   console.log(err.name, err.message);
-  console.log('UNCAUGHT EXCEPTION ❌. Shutting Down...');
+  console.log('❌ UNCAUGHT EXCEPTION. Shutting Down...');
   process.exit(1);
 });
 
@@ -34,8 +34,18 @@ const server = app.listen(port, () => {
 
 process.on('unhandledRejection', err => {
   console.log(err.name, err.message);
-  console.log('UNHANDLED REJECTION ❌. Shutting Down...');
+  console.log('❌ UNHANDLED REJECTION. Shutting Down...');
   server.close(() => {
     process.exit(1);
+  });
+});
+
+// heroku gives SIGTERM to terminate the app and restart it once every 24hr
+// so we catch this signal and close the server gracefully
+process.on('SIGTERM', () => {
+  console.log(' SIGTERM received. Shutting down gracefully');
+  // server.close() ensures that ongoing requests are begin handled properly
+  server.close(() => {
+    console.log('❌ Process Terminated!');
   });
 });
