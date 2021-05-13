@@ -7,6 +7,8 @@ const router = express.Router();
 
 router.use(authController.isLoggedIn);
 
+router.use(viewController.alerts);
+
 router.get(
   '/',
   // bookingController.createBookingCheckout, //cuz stripe redirects to home page upon successful payment BUT now we use stripe webhooks

@@ -4,6 +4,7 @@ import { login, logout } from './login';
 import { displayMap } from './mapbox';
 import { updateSettings } from './updateSettings';
 import { stripeSession } from './stripe';
+import { showAlert } from './alert';
 
 // console.log('hello from index');
 
@@ -81,3 +82,7 @@ if (bookTourButton) {
     bookTourButton.textContent = 'Book tour now!';
   });
 }
+
+// ## alerts (booking alert)
+const alert = document.getElementsByTagName('body').dataset.alert;
+if (alert) showAlert('success', alert, 20);

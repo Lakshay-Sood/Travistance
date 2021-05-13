@@ -54,3 +54,12 @@ exports.getUser = (req, res, next) => {
     // user   we dont have to pass user here cuz its already in the res.locals
   });
 };
+
+exports.alerts = (req, res, next) => {
+  const { alert } = req.query;
+  if (alert === 'booking') {
+    res.locals.alert = `Your booking was successful. Please check your email. \nIf the booking doesn't show up here, check again later.`;
+  }
+
+  next();
+};
